@@ -1,0 +1,226 @@
+
+% Include LaTeX packages
+\documentclass[conference]{acmsiggraph}
+\usepackage{comment} % enables the use of multi-line comments (\ifx \fi)
+\usepackage{fullpage}
+\usepackage{enumitem}
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{etoolbox}
+\usepackage{verbatim}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{fancyvrb}
+\usepackage{hyperref}
+\usepackage{menukeys}
+\usepackage{titlesec}
+
+% Set additional LaTeX options
+\setlength{\parskip}{.8mm}
+\setcounter{MaxMatrixCols}{20}
+\hypersetup{
+	colorlinks=true,
+	urlcolor=[rgb]{0.97,0,0.30},
+	anchorcolor={0.97,0,0.30},
+	linkcolor=black,
+	filecolor=[rgb]{0.97,0,0.30},
+}
+
+% Define title, author, and affiliation information
+\title{\huge Dimension and Rank of Effective Input Matrix}
+\author{\Large Minhuan Li \quad minhuanli@g.harvard.edu}
+\pdfauthor{minhuan}
+
+% Redefine \VerbatimInput
+\RecustomVerbatimCommand{\VerbatimInput}{VerbatimInput}%
+{fontsize=\footnotesize,
+ %
+ frame=lines, % top and bottom rule only
+ framesep=2em, % separation between frame and text
+ rulecolor=\color{Gray},
+ %
+ label=\fbox{\color{Black}\textbf{OUTPUT}},
+ labelposition=topline,
+ %
+ commandchars=\|\(\), % escape character and argument delimiters for commands within the verbatim
+ commentchar=* % comment character
+}
+
+% Set addditional formatting options
+\titlespacing*{\section}{0pt}{5.5ex plus 1ex minus .2ex}{2ex}
+\titlespacing*{\subsection}{0pt}{3ex}{2ex}
+\setcounter{secnumdepth}{4}
+\renewcommand\theparagraph{\thesubsubsection.\arabic{paragraph}}
+\newcommand\subsubsubsection{\paragraph}
+
+% Define a convenient norm symbol
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+
+% Define a macro for hiding answers
+\newbool{hideanswers} \setbool{hideanswers}{false}
+\newenvironment{answer}{}{}
+\ifbool{hideanswers}{\AtBeginEnvironment{answer}{\comment} %
+\AtEndEnvironment{answer}{\endcomment}}{}
+
+% Define text formatting for points and normals
+\newcommand{\points}[1]{\hfill \normalfont{(\textit{#1pts})}}
+\newcommand{\pointsin}[1]{\normalfont{(\textit{#1pts})}}
+
+\begin{document}
+\maketitle
+
+This is a discussion document targeting the dimension and rank of effective input matrix in mixed selectivity project, based on Arvin's thesis. I will give the expressions of those two important parameters, different from that in Arvin's thesis.
+
+
+\section{Basic Framework}
+
+This discussion is based on CEMS model in Arvin's thesis. The basic framework is described below: 
+
+\subsection{Input layer, Mixed layer and Readout layer}
+
+3 layers in total, first layer is input layer, second layer is mixed layer, and third layer is linear readout layer. 
+
+Input layer gathers information from $N_m$ independent modalities, in which there are $N_m - 1$ contexts and 1 task-relevant stimuli. Dimension of contextual vectors is $M$ and dimension of stimuli vectors is $N$. So the dimension of general vector in input layer is $N + M(N_m-1)$. Stimuli modality has $P$ independent samples, while each contextual modality has $K$ independent samples. The total input data matrix is $\mathbf{\xi} \in \mathbb{R}^{N + M(N_m-1),PK^{N_m-1}}$
+
+Input layer connects to the second layer in a manner called mixed selectivity. Given the mixing index $\mathcal{M}$, each neuron in second layer non-linearly mixes information of $\mathcal{M} - 1$ contextual modalities and 1 stimuli modality in input layer. The connection is realized by random matrix $\mathbf{J}$. 
+
+Then a linear readout based on the second layer gives classification.
+
+\subsection{Parameters list}
+\begin{align*}
+    &N_m    &\text{Modality Number} \\
+    &N      &\text{Task-Relevant Stimuli Vector Dimension} \\
+    &P      &\text{Number of Independent Stimuli Samples} \\
+    &M      &\text{Context Vector Dimension} \\
+    &K      &\text{Number of Independent Contextual Samples in each Modality} \\
+    &\mathcal{M}      &\text{Mixing Index} \\
+    &N_c         &\text{Vector Dimension in the Mixed Layer} \\
+    &\mathbf{\epsilon}    &\text{Notation to Represent Stimuli Data} \\
+    &\mathbf{\sigma,\mu,\eta}  &\text{Notations to Represent Contextual Data} \\
+    &\mathcal{P}     &\text{Number of Partitions in Mixing}
+\end{align*}
+
+\section{Effective Input Matrix}
+
+Effective input matrix is the data matrix of mixed layer. As the linear readout is implemented after mixed layer, properties of effective input matrix are strongly relevant to the classification capacity. 
+
+\subsection{Why we care about rank $r$?}
+
+According to ShK theory\footnote{Takashi Shinzato and Yoshiyuki Kabashima. “Perceptron capacity revisited: clas- sification ability for correlated patterns”. In: Journal of Physics A: Mathematical and Theoretical 41.32 (2008), p. 324013.}, the capacity of correlated dataset is:
+
+\begin{equation}
+    \alpha_c = 2c
+\end{equation}
+
+$c = r/N$, while N is the dimension of data vector, r is the matrix rank.
+
+\subsection{Partition Scheme and Dimension of Effective Input Matrix}
+
+The first dim is $N_c$, the length of vector. The second dim corresponds to the number of data combinations. Given we have $N_m$ modality and mixing index is $\mathcal{M} > 1$. The the number of partitions, groups of stimuli and contextual modalities mixture, is:
+
+\begin{equation}
+    \mathcal{P}(N_m,\mathcal{M}) = {N_m-1 \choose \mathcal{M}-1}
+\end{equation}
+
+Specially, $\mathcal{P} = N_m$ if $\mathcal{M} = 1$. In each partition, number of independent data combinations is
+
+\begin{equation*}
+    PK^{\mathcal{M}-1}
+\end{equation*}
+
+So, the total number of data combinations, as well as the second dim, is:
+
+\begin{equation}
+    [PK^{\mathcal{M}-1}]^{\mathcal{P}}, \quad \text{if} \ \mathcal{M} > 1
+\end{equation}
+
+If $\mathcal{M} = 1$, the second dim is:
+
+\begin{equation}
+    PK^{N_m-1}, \quad \text{if} \ \mathcal{M} = 1
+\end{equation}
+
+So the dimension of effective input matrix is:
+
+\begin{align}
+    \bar{\mathbf{\xi}} \in \mathbb{R}^{{N_c} \times [PK^{\mathcal{M}-1}]^{\mathcal{P}}}, &\quad \text{if} \ \mathcal{M} > 1 \\
+    \bar{\mathbf{\xi}} \in \mathbb{R}^{{N_c} \times PK^{N_m-1}}, &\quad \text{if} \ \mathcal{M} = 1
+\end{align}
+
+For example, set $N_m = 3$ and $\mathcal{M} = 2$, a partial selectivity one. We have stimuli data $\{\epsilon_1,\dots,\epsilon_P\}$, context data $\{\sigma_1,\dots,\sigma_K\}$ and $\{\eta_1,\dots,\eta_K\}$. Then we have two partition scheme:
+
+\begin{equation*}
+    (\epsilon,\sigma) \quad \text{and} \quad (\epsilon,\eta)
+\end{equation*}
+
+The effective data matrix is like:
+
+\begin{equation}
+\begin{bmatrix}
+h(\epsilon_1,\sigma_1), & \dots, & h(\epsilon_P,\sigma_K), & h(\epsilon_1,\sigma_1), & \dots, & h(\epsilon_P,\sigma_K), & \dots, & h(\epsilon_1,\sigma_1), & \dots, & h(\epsilon_P,\sigma_K) \\
+h(\epsilon_1,\eta_1), & \dots, & h(\epsilon_1,\eta_1), & h(\epsilon_1,\eta_2), & \dots, & h(\epsilon_1,\eta_2), & \dots, & h(\epsilon_P,\eta_K), & \dots, & h(\epsilon_P,\eta_K)
+\end{bmatrix}
+\end{equation}
+
+The row number is $N_c$ and the column number is $P^2K^2$, which agree with the general expression we got above.
+
+For $N_m = 3$ and $\mathcal{M} = 1$, dimension is $N_c \times PK^2$; $N_m = 3$ and $\mathcal{M} = 3$, dimension is again $N_c \times PK^2$
+
+
+\subsection{Rank of Effective Input Matrix}
+
+Again set $N_m = 3$ and $\mathcal{M} = 2$, a partial selectivity one, as example. The effective data matrix is: 
+
+\begin{equation}
+\begin{bmatrix}
+h(\epsilon_1,\sigma_1), & \dots, & h(\epsilon_P,\sigma_K), & h(\epsilon_1,\sigma_1), & \dots, & h(\epsilon_P,\sigma_K), & \dots, & h(\epsilon_1,\sigma_1), & \dots, & h(\epsilon_P,\sigma_K) \\
+h(\epsilon_1,\eta_1), & \dots, & h(\epsilon_1,\eta_1), & h(\epsilon_1,\eta_2), & \dots, & h(\epsilon_1,\eta_2), & \dots, & h(\epsilon_P,\eta_K), & \dots, & h(\epsilon_P,\eta_K)
+\end{bmatrix}
+\end{equation}
+
+Make column subtractions to transfer the matrix. We can view every $PK$ columns as a block ($PK$ blocks in total). In each block, subtract the first column from the remaining columns, we get:
+
+\begin{equation}
+\begin{bmatrix}
+h(\epsilon_1,\sigma_1), &h(\epsilon_1,\sigma_2)-h(\epsilon_1,\sigma_1), & \dots, & h(\epsilon_P,\sigma_K)-h(\epsilon_1,\sigma_1), & \dots, & h(\epsilon_1,\sigma_1), &h(\epsilon_1,\sigma_2)-h(\epsilon_1,\sigma_1), & \dots, & h(\epsilon_P,\sigma_K)-h(\epsilon_1,\sigma_1) \\
+h(\epsilon_1,\eta_1), & 0, &\dots, & 0, & \dots, & h(\epsilon_P,\eta_K), &0, & \dots, & 0
+\end{bmatrix}
+\end{equation}
+
+Then we could easily find redundant columns: except the first columns, all other columns are identical between different blocks. Then, make further subtractions to make it clear:
+
+\begin{equation}
+\begin{bmatrix}
+h(\epsilon_1,\sigma_1), &h(\epsilon_1,\sigma_2)-h(\epsilon_1,\sigma_1), & \dots, & h(\epsilon_P,\sigma_K)-h(\epsilon_1,\sigma_1), &,h(\epsilon_1,\sigma_1), &0, &\dots, &0, &\dots, & h(\epsilon_1,\sigma_1), &0, & \dots, &0 \\
+h(\epsilon_1,\eta_1), & 0, &\dots, & 0, &h(\epsilon_1,\eta_2), &0, &\dots, &0, &\dots, &h(\epsilon_P,\eta_K), &0, & \dots, &0
+\end{bmatrix}
+\end{equation}
+
+So the first block has $PK$ nonzero columns, while each the remaining blocks only have one nonzero column, so the column rank is:
+
+\begin{equation}
+    PK + PK - 1 = 2PK - 1 
+\end{equation}
+
+Or it can be computed from reducing redundant columns: $P^2K^2 - (PK-1)(PK-1) = 2PK - 1$
+
+So the rank of $N_m = 3$ and $\mathcal{M} = 2$ effective input matrix is:
+
+\begin{equation}
+    \min{\left(N_c, \ 2PK - 1\right)}
+\end{equation}
+
+In general, for a mixed-selectivity system with $N_m$ and $\mathcal{M}> 1$, the rank of effective input matrix is:
+
+\begin{equation}
+    \min\left( N_c,\ PK^{\mathcal{M}-1}+[PK^{\mathcal{M}-1}]^{\mathcal{P}-1}-1\right), \quad \text{if} \ \mathcal{M} > 1
+\end{equation}
+
+if $\mathcal{M} = 1$, the rank is:
+
+\begin{equation}
+    \min\left( N_c, \ P + K^{N_m-1} - 1\right) , \quad \text{if} \ \mathcal{M} = 1
+\end{equation}
+
+\end{document}
