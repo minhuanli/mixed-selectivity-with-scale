@@ -115,7 +115,7 @@ According to ShK theory\footnote{Takashi Shinzato and Yoshiyuki Kabashima. “Pe
 
 $c = r/N$, while N is the dimension of data vector, r is the matrix rank.
 
-\subsection{Partition Scheme and Dimension of Effective Input Matrix}
+\subsection{Partition Scheme}
 
 The first dim is $N_c$, the length of vector. The second dim corresponds to the number of data combinations. Given we have $N_m$ modality and mixing index is $\mathcal{M} > 1$. The the number of partitions, groups of stimuli and contextual modalities mixture, is:
 
@@ -123,32 +123,20 @@ The first dim is $N_c$, the length of vector. The second dim corresponds to the 
     \mathcal{P}(N_m,\mathcal{M}) = {N_m-1 \choose \mathcal{M}-1}
 \end{equation}
 
-Specially, $\mathcal{P} = N_m$ if $\mathcal{M} = 1$. In each partition, number of independent data combinations is
+Specially, $\mathcal{P} = N_m$ if $\mathcal{M} = 1$. 
 
-\begin{equation*}
-    PK^{\mathcal{M}-1}
-\end{equation*}
 
-So, the total number of data combinations, as well as the second dim, is:
+\subsection{Dimension of Effective Input Matrix}
 
-\begin{equation}
-    [PK^{\mathcal{M}-1}]^{\mathcal{P}}, \quad \text{if} \ \mathcal{M} > 1
-\end{equation}
-
-If $\mathcal{M} = 1$, the second dim is:
-
-\begin{equation}
-    PK^{N_m-1}, \quad \text{if} \ \mathcal{M} = 1
-\end{equation}
+As one independent data in input layer corresponds to one independent data in mixed layer, so the independent data number, as well as the matrix columns, are the same in both layers. 
 
 So the dimension of effective input matrix is:
 
 \begin{align}
-    \bar{\mathbf{\xi}} \in \mathbb{R}^{{N_c} \times [PK^{\mathcal{M}-1}]^{\mathcal{P}}}, &\quad \text{if} \ \mathcal{M} > 1 \\
-    \bar{\mathbf{\xi}} \in \mathbb{R}^{{N_c} \times PK^{N_m-1}}, &\quad \text{if} \ \mathcal{M} = 1
+    \bar{\mathbf{\xi}} \in \mathbb{R}^{{N_c} \times [PK^{N_m - 1}]}
 \end{align}
 
-For example, set $N_m = 3$ and $\mathcal{M} = 2$, a partial selectivity one. We have stimuli data $\{\epsilon_1,\dots,\epsilon_P\}$, context data $\{\sigma_1,\dots,\sigma_K\}$ and $\{\eta_1,\dots,\eta_K\}$. Then we have two partition scheme:
+With no relation to $\mathcal{M}$. For example, set $N_m = 3$ and $\mathcal{M} = 2$, a partial selectivity one. We have stimuli data $\{\epsilon_1,\dots,\epsilon_P\}$, context data $\{\sigma_1,\dots,\sigma_K\}$ and $\{\eta_1,\dots,\eta_K\}$. Then we have two partition scheme:
 
 \begin{equation*}
     (\epsilon,\sigma) \quad \text{and} \quad (\epsilon,\eta)
@@ -158,12 +146,12 @@ The effective data matrix is like:
 
 \begin{equation}
 \begin{bmatrix}
-h(\epsilon_1,\sigma_1), & \dots, & h(\epsilon_P,\sigma_K), & h(\epsilon_1,\sigma_1), & \dots, & h(\epsilon_P,\sigma_K), & \dots, & h(\epsilon_1,\sigma_1), & \dots, & h(\epsilon_P,\sigma_K) \\
+h(\epsilon_1,\sigma_1), & \dots, & h(\epsilon_1,\sigma_K), & h(\epsilon_1,\sigma_1), & \dots, & h(\epsilon_1,\sigma_K), & \dots, & h(\epsilon_P,\sigma_1), & \dots, & h(\epsilon_P,\sigma_K) \\
 h(\epsilon_1,\eta_1), & \dots, & h(\epsilon_1,\eta_1), & h(\epsilon_1,\eta_2), & \dots, & h(\epsilon_1,\eta_2), & \dots, & h(\epsilon_P,\eta_K), & \dots, & h(\epsilon_P,\eta_K)
 \end{bmatrix}
 \end{equation}
 
-The row number is $N_c$ and the column number is $P^2K^2$, which agree with the general expression we got above.
+The row number is $N_c$ and the column number is $PK^2$, which agree with the general expression we got above.
 
 For $N_m = 3$ and $\mathcal{M} = 1$, dimension is $N_c \times PK^2$; $N_m = 3$ and $\mathcal{M} = 3$, dimension is again $N_c \times PK^2$
 
@@ -174,53 +162,72 @@ Again set $N_m = 3$ and $\mathcal{M} = 2$, a partial selectivity one, as example
 
 \begin{equation}
 \begin{bmatrix}
-h(\epsilon_1,\sigma_1), & \dots, & h(\epsilon_P,\sigma_K), & h(\epsilon_1,\sigma_1), & \dots, & h(\epsilon_P,\sigma_K), & \dots, & h(\epsilon_1,\sigma_1), & \dots, & h(\epsilon_P,\sigma_K) \\
+h(\epsilon_1,\sigma_1), & \dots, & h(\epsilon_1,\sigma_K), & h(\epsilon_1,\sigma_1), & \dots, & h(\epsilon_1,\sigma_K), & \dots, & h(\epsilon_P,\sigma_1), & \dots, & h(\epsilon_P,\sigma_K) \\
 h(\epsilon_1,\eta_1), & \dots, & h(\epsilon_1,\eta_1), & h(\epsilon_1,\eta_2), & \dots, & h(\epsilon_1,\eta_2), & \dots, & h(\epsilon_P,\eta_K), & \dots, & h(\epsilon_P,\eta_K)
 \end{bmatrix}
 \end{equation}
 
-Make column subtractions to transfer the matrix. We can view every $PK$ columns as a block ($PK$ blocks in total). In each block, subtract the first column from the remaining columns, we get:
+Try to understand the matrix in hierarchical blocks. Smallest blocks are:
 
 \begin{equation}
 \begin{bmatrix}
-h(\epsilon_1,\sigma_1), &h(\epsilon_1,\sigma_2)-h(\epsilon_1,\sigma_1), & \dots, & h(\epsilon_P,\sigma_K)-h(\epsilon_1,\sigma_1), & \dots, & h(\epsilon_1,\sigma_1), &h(\epsilon_1,\sigma_2)-h(\epsilon_1,\sigma_1), & \dots, & h(\epsilon_P,\sigma_K)-h(\epsilon_1,\sigma_1) \\
-h(\epsilon_1,\eta_1), & 0, &\dots, & 0, & \dots, & h(\epsilon_P,\eta_K), &0, & \dots, & 0
+h(\epsilon_i,\sigma_1), & h(\epsilon_i,\sigma_2),& \dots, & h(\epsilon_i,\sigma_K)  \\
+h(\epsilon_i,\eta_j),&h(\epsilon_i,\eta_j),& \dots, & h(\epsilon_i,\eta_j)
 \end{bmatrix}
 \end{equation}
 
-Then we could easily find redundant columns: except the first columns, all other columns are identical between different blocks. Then, make further subtractions to make it clear:
+In each smallest blocks, the elements on second row are identical. Then, combine different $j$, we got the second level blocks:
 
 \begin{equation}
 \begin{bmatrix}
-h(\epsilon_1,\sigma_1), &h(\epsilon_1,\sigma_2)-h(\epsilon_1,\sigma_1), & \dots, & h(\epsilon_P,\sigma_K)-h(\epsilon_1,\sigma_1), &,h(\epsilon_1,\sigma_1), &0, &\dots, &0, &\dots, & h(\epsilon_1,\sigma_1), &0, & \dots, &0 \\
-h(\epsilon_1,\eta_1), & 0, &\dots, & 0, &h(\epsilon_1,\eta_2), &0, &\dots, &0, &\dots, &h(\epsilon_P,\eta_K), &0, & \dots, &0
+h(\epsilon_i,\sigma_1), & \dots, & h(\epsilon_i,\sigma_K), & \dots, &h(\epsilon_i,\sigma_1), & \dots, & h(\epsilon_i,\sigma_K)\\
+h(\epsilon_i,\eta_1), & \dots, & h(\epsilon_i,\eta_1),& \dots, &h(\epsilon_i,\eta_K), & \dots, & h(\epsilon_i,\eta_K)
 \end{bmatrix}
 \end{equation}
 
-So the first block has $PK$ nonzero columns, while each the remaining blocks only have one nonzero column, so the column rank is:
+Each second level blocks contains $K$ smallest blocks. Make column subtractions to transfer the second level blocks. In each smallest block, subtract the first column from the remaining columns, we get:
 
 \begin{equation}
-    PK + PK - 1 = 2PK - 1 
+\begin{bmatrix}
+h(\epsilon_i,\sigma_1), & h(\epsilon_i,\sigma_2) -h(\epsilon_i,\sigma_1) ,& \dots, & h(\epsilon_i,\sigma_K) - h(\epsilon_i,\sigma_1)  \\
+h(\epsilon_i,\eta_j),&0,& \dots, &0
+\end{bmatrix}
 \end{equation}
 
-Or it can be computed from reducing redundant columns: $P^2K^2 - (PK-1)(PK-1) = 2PK - 1$
-
-So the rank of $N_m = 3$ and $\mathcal{M} = 2$ effective input matrix is:
+Then we could easily find redundant columns among second level blocks: except the first columns, all other columns are identical between different smallest blocks. Then, make further subtractions to make it clear:
 
 \begin{equation}
-    \min{\left(N_c, \ 2PK - 1\right)}
+\begin{bmatrix}
+h(\epsilon_i,\sigma_1), & h(\epsilon_i,\sigma_2) -h(\epsilon_i,\sigma_1) ,& \dots, & h(\epsilon_i,\sigma_K) - h(\epsilon_i,\sigma_1),&h(\epsilon_i,\sigma_1), &0,&\dots, &h(\epsilon_i,\sigma_1),&0,&\dots \\
+h(\epsilon_i,\eta_1),&0,& \dots, &0, &h(\epsilon_i,\eta_2),&0,&\dots,&h(\epsilon_i,\eta_K),&0,&\dots
+\end{bmatrix}
 \end{equation}
 
-In general, for a mixed-selectivity system with $N_m$ and $\mathcal{M}> 1$, the rank of effective input matrix is:
+
+So the first smallest block has $K$ nonzero columns, while each the remaining smallest blocks only have one nonzero column, so the column rank in second level blocks is 
 
 \begin{equation}
-    \min\left( N_c,\ PK^{\mathcal{M}-1}+[PK^{\mathcal{M}-1}]^{\mathcal{P}-1}-1\right), \quad \text{if} \ \mathcal{M} > 1
+    K + K - 1 = 2K - 1 
 \end{equation}
 
-if $\mathcal{M} = 1$, the rank is:
+Then, for each $i = 1,\dots,P$, we have an independent second level block, the total column rank is:
 
 \begin{equation}
-    \min\left( N_c, \ P + K^{N_m-1} - 1\right) , \quad \text{if} \ \mathcal{M} = 1
+    (2K-1)P
 \end{equation}
+
+So the rank of $N_m = 3$ and $\mathcal{M}= 2$ effective input matrix is:
+
+\begin{equation}
+    \min{\left(N_c,\ (2K-1)P\right)}
+\end{equation}
+
+So the capacity is $\alpha_c = 2(2K-1)P/N_c$. We need $\alpha < \alpha_c$:
+
+\begin{equation}
+    \frac{2(2K-1)P}{N_c} > \frac{PK^2}{N_c}  \quad \Rightarrow \quad 2- \sqrt{2}< K < 2+ \sqrt{2}
+\end{equation}
+
+In a more general case with $N_m$ and $\mathcal{M}>1$, the rank could be:
 
 \end{document}
