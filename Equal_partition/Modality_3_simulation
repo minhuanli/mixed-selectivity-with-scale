@@ -1,0 +1,136 @@
+import numpy as np
+
+
+class modal_simu(object):
+
+    def __init__(self,Nm, N, M, P, K, Nc):
+        self.num_modality = Nm
+        self.dim_stimuli = int(N)
+        self.dim_context = int(M)
+        self.num_sti_sample = int(P)
+        self.num_con_sample = int(K)
+        self.dim_cortical = int(Nc)
+
+    def generate_input(self, P, N):
+        matrix = np.sign(np.random.randn(P, N))
+        return matrix
+
+    def fix_sparsity(self, v, f=0.5):
+
+        threshold = np.sort(v)[int((1-f)*v.size)]
+
+        exite = v >= threshold
+        inhibit = v < threshold
+
+        v[exite] = 1
+        v[inhibit] = 0
+
+        return v
+
+    def order_m(self,f=0.5):
+
+        Nm = self.num_modality
+        P = self.num_sti_sample
+        K = self.num_con_sample
+        N = self.dim_stimuli
+        Nc = self.dim_cortical
+        M = self.dim_context
+
+        p =
+
+        dim_orderm = int(Nc / 3)
+        J_sti = np.random.normal(0, 1 / np.sqrt(N), size=(dim_order1, N))
+        J_con1 = np.random.normal(0, 1 / np.sqrt(M), size=(dim_order1, M))
+        J_con2 = np.random.normal(0, 1 / np.sqrt(M), size=(dim_order1, M))
+
+        sti_data = self.generate_input(P, N)
+        con1_data = self.generate_input(K, M)
+        con2_data = self.generate_input(K, M)
+
+        mix_layer_data = np.zeros((P * K * K, Nc))
+
+        l = 0
+
+        for i in range(P):
+
+            for j in range(K):
+
+                for k in range(K):
+                    h_ijk = np.concatenate((self.fix_sparsity(np.matmul(J_sti, sti_data[i])),
+                                            self.fix_sparsity(np.matmul(J_con1, con1_data[j])),
+                                            self.fix_sparsity(np.matmul(J_con2, con2_data[k]))))
+                    # mix_layer_data[l,:] = self.fix_sparsity(h_ijk)
+                    mix_layer_data[l, :] = h_ijk
+                    l = l + 1
+
+        return mix_layer_data
+
+    def order_2(self):
+
+        P = self.num_sti_sample
+        K = self.num_con_sample
+        N = self.dim_stimuli
+        Nc = self.dim_cortical
+        M = self.dim_context
+
+        dim_order2 = int(Nc / 2)
+        J_sti = np.random.normal(0, 1 / np.sqrt(N), size=(dim_order2, N))
+        J_con1 = np.random.normal(0, 1 / np.sqrt(M), size=(dim_order2, M))
+        J_con2 = np.random.normal(0, 1 / np.sqrt(M), size=(dim_order2, M))
+
+        sti_data = self.generate_input(P, N)
+        con1_data = self.generate_input(K, M)
+        con2_data = self.generate_input(K, M)
+
+        mix_layer_data = np.zeros((P * K * K, Nc))
+
+        l = 0
+
+        for i in range(P):
+
+            for j in range(K):
+
+                for k in range(K):
+                    h_ijk = np.concatenate((self.fix_sparsity(
+                        np.matmul(J_sti, sti_data[i]) + np.matmul(J_con1, con1_data[j])), self.fix_sparsity(
+                        np.matmul(J_sti, sti_data[i]) + np.matmul(J_con2, con2_data[k]))))
+                    # mix_layer_data[l,:] = self.fix_sparsity(h_ijk)
+                    mix_layer_data[l, :] = h_ijk
+                    l = l + 1
+
+        return mix_layer_data
+
+    def order_3(self):
+
+        P = self.num_sti_sample
+        K = self.num_con_sample
+        N = self.dim_stimuli
+        Nc = self.dim_cortical
+        M = self.dim_context
+
+        dim_order3 = int(Nc)
+        J_sti = np.random.normal(0, 1 / np.sqrt(N), size=(dim_order3, N))
+        J_con1 = np.random.normal(0, 1 / np.sqrt(M), size=(dim_order3, M))
+        J_con2 = np.random.normal(0, 1 / np.sqrt(M), size=(dim_order3, M))
+
+        sti_data = self.generate_input(P, N)
+        con1_data = self.generate_input(K, M)
+        con2_data = self.generate_input(K, M)
+
+        mix_layer_data = np.zeros((P * K * K, Nc))
+
+        l = 0
+
+        for i in range(P):
+
+            for j in range(K):
+
+                for k in range(K):
+                    h_ijk = self.fix_sparsity(
+                        np.matmul(J_sti, sti_data[i]) + np.matmul(J_con1, con1_data[j]) + np.matmul(J_con2,
+                                                                                                    con2_data[k]))
+                    # mix_layer_data[l,:] = self.fix_sparsity(h_ijk)
+                    mix_layer_data[l, :] = h_ijk
+                    l = l + 1
+
+        return mix_layer_data
