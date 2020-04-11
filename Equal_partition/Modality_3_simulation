@@ -1,7 +1,8 @@
 import numpy as np
+from itertools import combinations
+from scipy.special import comb,perm
 
-
-class modal_simu(object):
+class modal_forward(object):
 
     def __init__(self,Nm, N, M, P, K, Nc):
         self.num_modality = Nm
@@ -11,9 +12,18 @@ class modal_simu(object):
         self.num_con_sample = int(K)
         self.dim_cortical = int(Nc)
 
-    def generate_input(self, P, N):
-        matrix = np.sign(np.random.randn(P, N))
-        return matrix
+    def generate_input(self):
+
+        Nm = self.num_modality
+        P = self.num_sti_sample
+        K = self.num_con_sample
+        N = self.dim_stimuli
+        M = self.dim_context
+
+        self.data_0 = np.sign(np.random.randn(P, N))   # binary data, stimulus input
+
+        for i in range(1,Nm):
+            self.__dict__[f'data_{i}'] = np.sign(np.random.randn(K, M))   # dynamically generate instance
 
     def fix_sparsity(self, v, f=0.5):
 
@@ -27,7 +37,8 @@ class modal_simu(object):
 
         return v
 
-    def order_m(self,f=0.5):
+    # generate random_connectin matrixs for each partition
+    def random_connection(self,m):
 
         Nm = self.num_modality
         P = self.num_sti_sample
@@ -36,18 +47,50 @@ class modal_simu(object):
         Nc = self.dim_cortical
         M = self.dim_context
 
-        p =
+        # generate a dim_list for all modalities, convenient for later calculation of partition dimension
+        expr1 = lambda i: N if i == 0 else M
+        dim_list = [expr1(i) for i in range(Nm)]
 
-        dim_orderm = int(Nc / 3)
-        J_sti = np.random.normal(0, 1 / np.sqrt(N), size=(dim_order1, N))
-        J_con1 = np.random.normal(0, 1 / np.sqrt(M), size=(dim_order1, M))
-        J_con2 = np.random.normal(0, 1 / np.sqrt(M), size=(dim_order1, M))
+        p = comb(Nm, m, exact=True)  # total partition number
 
-        sti_data = self.generate_input(P, N)
-        con1_data = self.generate_input(K, M)
-        con2_data = self.generate_input(K, M)
+        p_t = comb(Nm - 1, m - 1, exact=True)  # number of partition with task-relevant stimulus
 
-        mix_layer_data = np.zeros((P * K * K, Nc))
+        p_list = list(combinations(range(Nm), m))  # total partition list
+
+        dim_order_m = int(Nc / p)  # dimension of each partion on cortical layer
+
+        # generate random connection matrix for each partition
+        for i in range(1, p):
+            dim_i = np.sum([dim_list[j] for j in p_list[i]])  # dimension of the partition on input layer
+
+            # dynamic variable naming
+            self.__dict__[f'J_{i}'] = np.random.normal(0, 1 / np.sqrt(m * dim_i), size=(dim_order_m, dim_i))
+
+        # random connection matrix for first partition, Now Nc dont have to be interger times of p
+        dim_0 = np.sum([dim_list[j] for j in p_list[0]])
+        self.J_0 = np.random.normal(0, 1 / np.sqrt(m * dim_0), size=(Nc - (p - 1) * dim_order_m, dim_0))
+
+
+
+
+    ## need to generate input data before run the order_m mixing
+    def order_m(m,self,f=0.5):
+
+        Nm = self.num_modality
+        P = self.num_sti_sample
+        K = self.num_con_sample
+        N = self.dim_stimuli
+        Nc = self.dim_cortical
+        M = self.dim_context
+
+
+
+        ## Now J_0 to J_p is the random connection matrix for each partition
+
+        # self.indata_0 to self.indata_Nm are the input data
+
+        # initialize the effective data matrix on cortical layer
+        mix_layer_data = np.zeros((P * K**(Nm-1), Nc))
 
         l = 0
 
