@@ -3,14 +3,19 @@ from itertools import combinations
 from scipy.special import comb,perm
 
 
-# About the parameters:
-# Nm is the number of modality
-# N is the dimension of stimulus input
-# M is the dimension of contexts input
-# P is the independent sample number of stimulus
-# K is the independent sample number of contexts
-# Nc is the neurons on cortical layer
+
 class mix_forward(object):
+
+    '''
+    About the parameters:
+    # Nm is the number of modality
+    # N is the dimension of stimulus input
+    # M is the dimension of contexts input
+    # P is the independent sample number of stimulus
+    # K is the independent sample number of contexts
+    # Nc is the neurons on cortical layer
+    '''
+
 
     def __init__(self,Nm, N, M, P, K, Nc):
         self.num_modality = Nm
@@ -148,7 +153,7 @@ class mix_forward(object):
 
 
     ## need to generate_input and random_before run the order_m mixing
-    def order_m(self,m,f=0.5,initial=True):
+    def order_m(self,m,f=0.5,initial_data=False):
 
         #------------claim parameters-------------#
         Nm = self.num_modality
@@ -159,7 +164,8 @@ class mix_forward(object):
         #------initialize the input_data and random_connection matrix------#
         ## Now J_0 to J_p is the random connection matrix for each partition
         ## self.indata_0 to self.indata_Nm are the input data
-        if initial : self.initialize(m)
+        if initial_data : self.generate_input()
+        self.random_connection(m)
 
         ##----generate a sample number list for all modalities, convenient for later mixing-----##
         expr2 = lambda i: P if i == 0 else K
