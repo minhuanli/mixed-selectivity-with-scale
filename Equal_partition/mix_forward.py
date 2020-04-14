@@ -89,7 +89,7 @@ class mix_forward(object):
 
         # random connection matrix for first partition, Now Nc dont have to be interger times of p
         dim_0 = np.sum([dim_list[j] for j in p_list[0]])
-        self.J_0 = np.random.normal(0, 1 / np.sqrt(m * dim_0), size=(Nc - (p - 1) * dim_order_m, dim_0))
+        self.J_0 = np.random.normal(0, 1 / np.sqrt(m * dim_0), size=(Nc - (p - 1) *  , dim_0))
 
 
     #-------initialize the input_data and random connection matrix------#
