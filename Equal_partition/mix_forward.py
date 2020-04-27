@@ -39,7 +39,9 @@ class mix_forward(object):
             self.__dict__[f'data_{i}'] = np.sign(np.random.randn(K, M))
 
     # -----fix the sparsity in the cortical layer-----#
-    def fix_sparsity(self, v, f=0.5):
+    def fix_sparsity(self, a, f=0.5):
+
+        v = a.copy()
 
         threshold = np.sort(v.flatten())[int((1 - f) * v.size)]
 
@@ -145,7 +147,7 @@ class mix_forward(object):
             sample_index.pop()
 
     ## need to generate_input and random_before run the order_m mixing
-    def order_m(self, m, f=0.5, initial_data=False):
+    def order_m(self, m, f=0.5, initial_data = False, return_h = False):
 
         # ------------claim parameters-------------#
         Nm = self.num_modality
@@ -174,6 +176,13 @@ class mix_forward(object):
         # -----use recursion to dynamically traverse all possible data and mix feedforwar them-----#
         self.dynloop_rcsn(sample_list, mix_layer_data, modality_index=0, sample_index=[])
 
-        mix_layer_data = self.fix_sparsity(mix_layer_data,f=f)
+        after_nonlinear = self.fix_sparsity(mix_layer_data,f=f)
 
-        return mix_layer_data
+        if return_h == False:
+
+            return after_nonlinear
+
+        else:
+
+            return after_nonlinear, mix_layer_data
+
