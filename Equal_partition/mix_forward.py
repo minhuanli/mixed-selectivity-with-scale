@@ -12,15 +12,23 @@ class mix_forward(object):
     # P is the independent sample number of stimulus
     # K is the independent sample number of contexts
     # Nc is the neurons on cortical layer
+    # delta_xi is the noise parameter for stimulus modality
+    # delta_phi is the noise parameter for contextutal modality
     '''
 
-    def __init__(self, Nm, N, M, P, K, Nc):
+    def __init__(self, Nm, N, M, P, K, Nc, delta_xi = None, delta_phi = None):
         self.num_modality = Nm
         self.dim_stimuli = int(N)
         self.dim_context = int(M)
         self.num_sti_sample = int(P)
         self.num_con_sample = int(K)
         self.dim_cortical = int(Nc)
+        self.sti_noise = delta_xi
+        self.con_noise = delta_phi
+
+    def flip(self,a,noise_parameter):
+        flip_vector = np.sign(np.random.rand(a.size)-noise_parameter/2.)
+        return a*flip_vector
 
     # ------- initialize random data input-------#
     def generate_input(self):
@@ -30,13 +38,37 @@ class mix_forward(object):
         K = self.num_con_sample
         N = self.dim_stimuli
         M = self.dim_context
+        delta_xi = self.sti_noise
+        delta_phi = self.con_noise
 
         # binary data, stimulus input
-        self.data_0 = np.sign(np.random.randn(P, N))
+        if delta_xi == None:
+            self.data_0 = np.sign(np.random.randn(P, N))
+        else:
+            self.data_0 = np.sign(np.random.randn(P, N))
+            # add noise
+            for i in range(1,P):
+                self.data_0[i,:] = self.flip(self.data_0[0,:],delta_xi)
 
-        for i in range(1, Nm):
-            # dynamically generate instance as input data
-            self.__dict__[f'data_{i}'] = np.sign(np.random.randn(K, M))
+
+        if delta_phi == None:
+
+            for i in range(1, Nm):
+                # dynamically generate instance as input data
+                self.__dict__[f'data_{i}'] = np.sign(np.random.randn(K, M))
+
+        else:
+
+            for i in range(1, Nm):
+
+                self.__dict__[f'data_{i}'] = np.sign(np.random.randn(K, M))
+
+                for j in range(1,K):
+                    self.__dict__[f'data_{i}'][j,:] = self.flip(self.__dict__[f'data_{i}'][0,:],delta_phi)
+
+
+
+
 
     # -----fix the sparsity in the cortical layer-----#
     def fix_sparsity(self, a, f=0.5):
