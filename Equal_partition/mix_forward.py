@@ -116,11 +116,25 @@ class mix_forward(object):
             dim_i = np.sum([dim_list[j] for j in p_list[i]])
 
             # dynamic variable naming
-            self.__dict__[f'J_{i}'] = np.random.normal(0, 1 / np.sqrt(m * dim_i), size=(dim_order_m, dim_i))
+            self.__dict__[f'J_{i}'] = np.zeros((dim_order_m, dim_i))
+            start_index = 0
+
+            for j in p_list[i]:
+                self.__dict__[f'J_{i}'][:,start_index:(start_index+dim_list[j])] = np.random.normal(0, 1 / np.sqrt(m * dim_list[j]), size=(dim_order_m, dim_list[j]))
+                start_index = start_index + dim_list[j]
+
+
 
         # random connection matrix for first partition, Now Nc dont have to be interger times of p
         dim_0 = np.sum([dim_list[j] for j in p_list[0]])
-        self.J_0 = np.random.normal(0, 1 / np.sqrt(m * dim_0), size=(Nc - (p - 1) * dim_order_m, dim_0))
+
+        self.J_0 = np.zeros((Nc - (p - 1) * dim_order_m, dim_0))
+        start_index = 0
+
+        for j in p_list[0]:
+                self.J_0[:,start_index:(start_index+dim_list[j])] = np.random.normal(0, 1 / np.sqrt(m * dim_list[j]), size=(Nc - (p - 1) * dim_order_m, dim_list[j]))
+                start_index = start_index + dim_list[j]
+  
 
     # -------initialize the input_data and random connection matrix------#
     def initialize(self, m):
