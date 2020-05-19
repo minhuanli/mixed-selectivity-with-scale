@@ -83,7 +83,7 @@ class mix_forward(object):
         v[exite] = 1
         v[inhibit] = 0
 
-        return v
+        return v,threshold
 
     # ---------generate random_connectin matrixs for each partition--------#
     def random_connection(self, m):
@@ -193,7 +193,12 @@ class mix_forward(object):
             sample_index.pop()
 
     ## need to generate_input and random_before run the order_m mixing
-    def order_m(self, m, f=0.5, initial_data = False, return_h = False):
+    def order_m(self, m, f=0.5, initial_data = False, return_m = True):
+        
+        
+        '''
+        if return_m == True: return h,m,T   else: return h 
+        '''
 
         # ------------claim parameters-------------#
         Nm = self.num_modality
@@ -222,13 +227,13 @@ class mix_forward(object):
         # -----use recursion to dynamically traverse all possible data and mix feedforwar them-----#
         self.dynloop_rcsn(sample_list, mix_layer_data, modality_index=0, sample_index=[])
 
-        after_nonlinear = self.fix_sparsity(mix_layer_data,f=f)
 
-        if return_h == False:
-
-            return after_nonlinear
+        if return_m == True:
+            
+            after_nonlinear,T = self.fix_sparsity(mix_layer_data,f=f)
+            return mix_layer_data, after_nonlinear, T
 
         else:
 
-            return after_nonlinear, mix_layer_data
+            return mix_layer_data
 
