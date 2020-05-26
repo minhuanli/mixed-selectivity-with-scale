@@ -72,6 +72,11 @@ class mix_forward(object):
 
     # -----fix the sparsity in the cortical layer-----#
     def fix_sparsity(self, a, f=0.5):
+        
+        '''
+        Input: matrix_h
+        Return: matrix_m, T
+        '''
 
         v = a.copy()
 
@@ -193,7 +198,7 @@ class mix_forward(object):
             sample_index.pop()
 
     ## need to generate_input and random_before run the order_m mixing
-    def order_m(self, m, f=0.5, initial_data = False, return_m = True):
+    def order_m(self, m, f=0.5, initial_data = False, return_m = True, initial_J = True):
         
         
         '''
@@ -210,7 +215,7 @@ class mix_forward(object):
         ## Now J_0 to J_p is the random connection matrix for each partition
         ## self.indata_0 to self.indata_Nm are the input data
         if initial_data: self.generate_input()
-        self.random_connection(m)
+        if initial_J: self.random_connection(m)
 
         ##----generate a sample number list for all modalities, convenient for later mixing-----##
         expr2 = lambda i: P if i == 0 else K
