@@ -6,6 +6,11 @@ __pycache__/
 # Max Osx catalog
 .DS_Store
 
+# Some pptx and slides notes
+*.pptx
+group_meeting_0506*
+Summary_2.pdf
+*.md
 
 # C extensions
 *.so
