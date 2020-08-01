@@ -55,12 +55,14 @@ def part3_func(Nc,P,K,p1,p2,f,q1,q2):
 
 def part4_func(Nc,N,M,P,K,p1,p2,p3,f,T,q1,q2):
     
-    term1 = 2*(Nc*p1*f)**2 * (K-1) * (q1-f**2)
-    term2 = 2*(Nc*p2*f)**2 * (P-1) * (q2-f**2)
+    term1 = (Nc*p1)**2 * (K-1) * (q1-f**2)**2
+    term2 = (Nc*p2)**2 * (P-1) * (q2-f**2)**2
     term3 = 2*Nc**2*p1*p2*(K-1)*(P-1)*(q1-f**2)*(q2-f**2) / (P*K-1)
-    term4 = Nc**2*(P*K-1)*(p1**2/N + p2**2/M + p3**2/(M+N) )*np.exp(-2*T**2) / (2*np.pi)**2
+    term4 = Nc**2 * (P*K-K) * p1**2 * (1/N) *np.exp(-2*T**2)/(2*np.pi)**2
+    term5 = Nc**2 * (P*K-P) * p2**2 * (1/M) *np.exp(-2*T**2)/(2*np.pi)**2
+    term6 = Nc**2 * (P*K-1) * p3**2 * (1/(N+M)) *np.exp(-2*T**2)/(2*np.pi)**2
     
-    return term1 + term2 + term3 + term4
+    return term1 + term2 + term3 + term4 + term5 + term6
     
 def Readerror_theory(Nc,N,M,P,K,p1,p2,p3,f,delta_sigma,delta_eta):
     
